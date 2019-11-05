@@ -16,5 +16,6 @@ describe('absolute', () => {
         const result = lib.absolute(0);
         expect(result).toBe(0);
     });
+
 })
 

@@ -1,5 +1,6 @@
 const lib = require('../lib');
 const db = require('../db');
+const mail = require('../mail')
 /*
 - Calculate execution paths and make sure test covers 
 - Find balance between too generall and too specific
@@ -88,4 +89,22 @@ describe('applyDiscount', () => {
     const order = { customerId: 1, totalPrice: 10 };  
     lib.applyDiscount(order);
     expect(order.totalPrice).toBe(9);
+})
+
+describe('notifyCustomer', () => {
+    it('should send an email to the customer', () => {
+        // const mockFunction = jest.fn();
+        // mockFunction();
+        // // mockFunction.mockReturnValue(1); //
+        // // mockFunction.mockResolveValue(1); //
+        // mockFunction.mockRejectValue(new Error('....'));//
+        // const result = mockFunction()
+        db.getCustomerSync = jest.fn().mockReturnValue({ email: 'a' });
+        mail.send = jest.fn();
+        lib.notifyCustomer({ customerId: 1 });
+        expect(mail.send).toHaveBeenCalled();
+        expect(mail.send.mock.calls[0][0]).toBe('a')
+        expect(mail.send.mock.calls[0][1]).toMatch(/order/)
+
+    })
 })

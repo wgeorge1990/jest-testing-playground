@@ -1,4 +1,5 @@
 const lib = require('../lib');
+const db = require('../db');
 /*
 - Calculate execution paths and make sure test covers 
 - Find balance between too generall and too specific
@@ -59,4 +60,32 @@ describe('getProduct', () => {
         // 3. Checks for existence of specific attribute with provided value. TYPE MATTERS!
         expect(result).toHaveProperty('id', 1);
     })
+})
+
+// Exceptions
+describe('registerUser', () => {
+    it("it should throw if username is falsy(null, undefined, nan, '', 0, false ", () => {
+        const args = [null, undefined, NaN, '', 0, false]
+        args.forEach(arg => {
+             expect(() => { lib.registerUser(arg) }).toThrow()
+        })   
+    }) 
+
+    it('should return a user object if valid username is passed', () => {
+        const result = lib.registerUser( 'will')
+        expect(result).toMatchObject({ username: 'will' })
+        console.log('id:' + result.id)
+        expect(result.id).toBeGreaterThan(0)
+    })
+});
+
+describe('applyDiscount', () => {
+    db.getCustomerSync = function (customerId) {
+        console.log('Fake reading customer')
+        return { id: customerId, points: 20 };
+    }
+
+    const order = { customerId: 1, totalPrice: 10 };  
+    lib.applyDiscount(order);
+    expect(order.totalPrice).toBe(9);
 })
